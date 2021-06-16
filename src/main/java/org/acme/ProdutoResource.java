@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,15 +26,18 @@ public class ProdutoResource{
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Produto> getProdutos(@BeanParam Params params) {
-
-        System.out.println(params.getOrderBy());
-
-        return entityManager
-        .createNativeQuery("SELECT * FROM produto ORDER BY :orderBy ASC", Produto.class)
-        .setFirstResult(params.getOffset())
-        .setMaxResults(params.getLimit())
-        .setParameter("orderBy", params.getOrderBy())
-        .getResultList();
+        
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Produto> criteriaQuery = criteriaBuilder.createQuery(Produto.class);
+        Root<Produto> from = criteriaQuery.from(Produto.class);
+        CriteriaQuery<Produto> select = criteriaQuery.select(from);
+        criteriaQuery.orderBy(criteriaBuilder.asc(from.get(params.getOrderBy())));
+        
+        return 
+            entityManager.createQuery(criteriaQuery)
+            .setFirstResult(params.getOffset())
+            .setMaxResults(params.getLimit())
+            .getResultList();
     }   
 
     @GET
