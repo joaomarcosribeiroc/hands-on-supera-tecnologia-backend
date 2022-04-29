@@ -7,7 +7,7 @@ public class Params {
     @DefaultValue("id")
     @QueryParam("orderBy")
     private String orderBy;
-    @DefaultValue("4")
+    @DefaultValue("10")
     @QueryParam("limit")
     private int limit;
     @DefaultValue("1")
